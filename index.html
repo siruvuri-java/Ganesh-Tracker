@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sai Ganesh Varma Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background: linear-gradient(90deg, #1a237e, #3949ab);
+      color: white;
+      padding: 1em;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    .datetime, .study-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-size: 0.9em;
+    }
+    .study-controls {
+      align-items: flex-start;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1em;
+      width: 90%;
+      max-width: 1200px;
+      margin-top: 1em;
+    }
+    h2 {
+      color: #1a237e;
+      margin-bottom: 0.5em;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.3em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #3949ab;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #1a237e;
+    }
+    .card {
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 1em;
+      border-radius: 8px;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      background: #eef1f5;
+      margin-bottom: 0.3em;
+      padding: 0.5em;
+      border-radius: 4px;
+    }
+    canvas {
+      margin-top: 1em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="study-controls">
+      <button onclick="startStudy()">Start Study Timer</button>
+      <button onclick="stopStudy()">Stop Timer</button>
+      <span id="studyTime">Study Time: 0 min</span>
+    </div>
+    <h1>Sai Ganesh Personal Dashboard</h1>
+    <div class="datetime">
+      <span id="date"></span>
+      <span id="time"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>💼 Earnings Tracker</h2>
+      <input type="number" id="hoursWorked" placeholder="Enter hours worked" />
+      <button onclick="calculateEarnings()">Calculate Earnings</button>
+      <p id="earningsResult"></p>
+    </section>
+
+    <section class="card">
+      <h2>💸 Expenses</h2>
+      <input type="number" id="expenseAmount" placeholder="Amount" />
+      <input type="text" id="expenseNote" placeholder="Note" />
+      <input type="number" id="splitCount" placeholder="Split Between (optional)" />
+      <button onclick="addExpense()">Add Expense</button>
+      <ul id="expenseList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>👨‍💻 Java Learning</h2>
+      <input type="text" id="javaTopic" placeholder="Topic" />
+      <select id="javaStatus">
+        <option>Not Started</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+      </select>
+      <button onclick="addJavaTopic()">Add Topic</button>
+      <ul id="javaList"></ul>
+      <canvas id="javaChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>📨 Job Applications</h2>
+      <input type="text" id="companyName" placeholder="Company Name" />
+      <input type="text" id="roleName" placeholder="Role" />
+      <select id="appStatus">
+        <option>Applied</option>
+        <option>Interview</option>
+        <option>Offer</option>
+      </select>
+      <button onclick="addApplication()">Track Application</button>
+      <ul id="applicationList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>📝 To-Do List</h2>
+      <input type="text" id="todoInput" placeholder="Enter task..." />
+      <button onclick="addTodo()">Add Task</button>
+      <ul id="todoList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>🧠 Motivation</h2>
+      <p>"Stay focused. Stay consistent. Your time is now."</p>
+    </section>
+  </main>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById("date").textContent = now.toLocaleDateString();
+      document.getElementById("time").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    let studyTimer = null;
+    let minutesStudied = 0;
+    function startStudy() {
+      if (!studyTimer) {
+        studyTimer = setInterval(() => {
+          minutesStudied++;
+          document.getElementById("studyTime").textContent = `Study Time: ${minutesStudied} min`;
+          if (minutesStudied % 40 === 0) {
+            alert("💡 Great job! Keep going — you're doing amazing!");
+          }
+        }, 60000);
+      }
+    }
+    function stopStudy() {
+      clearInterval(studyTimer);
+      studyTimer = null;
+    }
+
+    function calculateEarnings() {
+      const hours = parseFloat(document.getElementById("hoursWorked").value);
+      const pay = 12;
+      const total = hours * pay;
+      document.getElementById("earningsResult").textContent = `You earned $${total.toFixed(2)} today.`;
+    }
+
+    function addExpense() {
+      const amt = parseFloat(document.getElementById("expenseAmount").value);
+      const note = document.getElementById("expenseNote").value;
+      const split = parseInt(document.getElementById("splitCount").value);
+      const result = split > 1 ? amt / split : amt;
+      const li = document.createElement("li");
+      li.textContent = `${note}: $${result.toFixed(2)} ${split > 1 ? `(split among ${split})` : ""}`;
+      document.getElementById("expenseList").appendChild(li);
+    }
+
+    const javaTopics = [];
+    function addJavaTopic() {
+      const topic = document.getElementById("javaTopic").value;
+      const status = document.getElementById("javaStatus").value;
+      javaTopics.push({ topic, status });
+      const li = document.createElement("li");
+      li.textContent = `${topic} - ${status}`;
+      document.getElementById("javaList").appendChild(li);
+      renderJavaChart();
+    }
+
+    function renderJavaChart() {
+      const ctx = document.getElementById("javaChart").getContext("2d");
+      const counts = { "Not Started": 0, "In Progress": 0, "Completed": 0 };
+      javaTopics.forEach(t => counts[t.status]++);
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(counts),
+          datasets: [{
+            label: 'Java Learning Progress',
+            data: Object.values(counts),
+            backgroundColor: ['gray', 'orange', 'green']
+          }]
+        }
+      });
+    }
+
+    function addApplication() {
+      const company = document.getElementById("companyName").value;
+      const role = document.getElementById("roleName").value;
+      const status = document.getElementById("appStatus").value;
+      const li = document.createElement("li");
+      li.textContent = `${company} - ${role} [${status}]`;
+      document.getElementById("applicationList").appendChild(li);
+      if (status === "Offer") {
+        alert("🎉 You got a job offer! Congrats!");
+      }
+    }
+
+    function addTodo() {
+      const input = document.getElementById("todoInput");
+      const task = input.value.trim();
+      if (task) {
+        const list = document.getElementById("todoList");
+        const li = document.createElement("li");
+        li.textContent = task;
+        li.onclick = () => li.remove();
+        list.appendChild(li);
+        input.value = "";
+      }
+    }
+  </script>
+</body>
+</html>
